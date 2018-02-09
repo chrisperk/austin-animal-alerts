@@ -1,12 +1,26 @@
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var passport = require('passport');
+var passportService = require('./services/passport');
 
+var AuthRouter = require('./routes/AuthenticationRoutes');
 var index = require('./routes/index');
 var users = require('./routes/users');
+
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/austin-animal-alerts')
+  .then(function () {
+    console.log('[mongoose] Connected to MongoDB')
+  })
+  .catch(function () {
+    console.log('[mongoose] Error connecting to MongoDB')
+  });
 
 var app = express();
 
@@ -22,6 +36,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(AuthRouter);
 app.use('/', index);
 app.use('/users', users);
 
