@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var passportService = require('./services/passport');
+require('./services/passport');
 
 var AuthRouter = require('./routes/AuthenticationRoutes');
 var index = require('./routes/index');
@@ -39,6 +39,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(AuthRouter);
 app.use('/', index);
 app.use('/users', users);
+
+// secret page to test auth
+const authStrategy = passport.authenticate('authStrategy', { session: false });
+app.get('/api/secret', authStrategy, function (req, res) {
+  res.send(`The current user is ${req.user.username}`);
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

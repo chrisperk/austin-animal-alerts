@@ -19,11 +19,14 @@ router.post('/api/signin', signinStrategy, function (req, res) {
 });
 
 router.post('/api/signup', function (req, res, next) {
-    const { username, password } = req.body;
+    console.log(req.body);
+    const username = req.body.username;
+    const password = req.body.password;
+    const email = req.body.email;
 
-    if (!username || !password) {
+    if (!username || !password || !email) {
         return res.status(422)
-            .json({ error: 'You must provide a username and password' });
+            .json({ error: 'You must provide a username, password, and email' });
     }
 
     User.findOne({ username }).exec()
@@ -37,7 +40,7 @@ router.post('/api/signup', function (req, res, next) {
                     return next(error);
                 }
 
-                const user = new User({ username, password: hashedPassword });
+                const user = new User({ username, password: hashedPassword, email });
 
                 user.save()
                     .then(newUser => res.json({ token: tokenForUser(newUser) }));
